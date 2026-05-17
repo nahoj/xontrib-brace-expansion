@@ -14,6 +14,9 @@ See also:
 """
 import bracex
 from xonsh.events import events
+from xonsh.parsers.lexer import Lexer
+
+_lexer = Lexer(tolerant=True)
 
 
 def _expand_line(line: str) -> str:
@@ -24,10 +27,17 @@ def _expand_line(line: str) -> str:
     stripped = line.lstrip()
     indent = line[: len(line) - len(stripped)]
 
+    try:
+        tokens = _lexer.split(stripped)
+    except Exception:
+        return line
+    if not tokens:
+        return line
+
     expanded_parts = [
         expansion
-        for part in stripped.split()
-        for expansion in bracex.expand(part)
+        for token in tokens
+        for expansion in bracex.expand(token)
     ]
     return indent + " ".join(expanded_parts)
 

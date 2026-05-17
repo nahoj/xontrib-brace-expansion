@@ -13,6 +13,12 @@ def test_multiline_command_preserved():
     assert expand_braces(cmd) == cmd
 
 
+def test_whitespace_inside_quotes_preserved():
+    # "a  b" must not be split then joined with a single space.
+    cmd = 'echo "a  b" {x,y}'
+    assert expand_braces(cmd) == 'echo "a  b" x y'
+
+
 def test_env_var_lookup_not_expanded():
     # ${VAR} is an environment-variable lookup in xonsh, not a brace
     # expansion: it must be left alone.
