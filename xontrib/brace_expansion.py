@@ -19,6 +19,14 @@ from xonsh.parsers.lexer import Lexer
 _lexer = Lexer(tolerant=True)
 
 
+def _is_valid_python(src: str) -> bool:
+    try:
+        compile(src, "<brace_expansion>", "exec")
+    except SyntaxError:
+        return False
+    return True
+
+
 def _expand_line(line: str) -> str:
     if "{" not in line:
         return line
@@ -26,6 +34,12 @@ def _expand_line(line: str) -> str:
     # Preserve leading whitespace
     stripped = line.lstrip()
     indent = line[: len(line) - len(stripped)]
+
+    # Don't expand a valid Python line (in which {} means dict/set).
+    # This does not catch lines that are part of multiline statements
+    # such as `if True:` or `"a": 1,`.
+    if _is_valid_python(stripped):
+        return line
 
     try:
         tokens = _lexer.split(stripped)

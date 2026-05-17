@@ -24,3 +24,23 @@ def test_env_var_lookup_not_expanded():
     # expansion: it must be left alone.
     cmd = "echo ${HOME}"
     assert expand_braces(cmd) == cmd
+
+
+def test_python_set_literal_not_expanded():
+    cmd = "print({1,2,3})"
+    assert expand_braces(cmd) == cmd
+
+
+def test_python_dict_literal_not_expanded():
+    cmd = "d = {'a':1,'b':2}"
+    assert expand_braces(cmd) == cmd
+
+
+def test_subproc_inside_python_block_expanded():
+    cmd = "for i in range(3):\n    echo a{b,c}"
+    assert expand_braces(cmd) == "for i in range(3):\n    echo ab ac"
+
+
+def test_python_literal_inside_python_block_not_expanded():
+    cmd = "for i in range(3):\n    print({i,i+1})"
+    assert expand_braces(cmd) == cmd
