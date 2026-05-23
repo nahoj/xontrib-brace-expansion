@@ -12,6 +12,9 @@ See also:
 * https://facelessuser.github.io/bracex/
 * https://www.gnu.org/software/bash/manual/html_node/Brace-Expansion.html
 """
+import traceback
+import warnings
+
 import bracex
 from xonsh.events import events
 from xonsh.parsers.lexer import Lexer
@@ -30,6 +33,7 @@ def _expand_line(line: str) -> str:
     try:
         tokens = _lexer.split(stripped)
     except Exception:
+        warnings.warn(traceback.format_exc())
         return line
     if not tokens:
         return line
